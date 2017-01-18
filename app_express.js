@@ -1,7 +1,10 @@
 var http = require('http');
 var express = require('express')
 var bodyParser = require('body-parser')
-var mysql = require('mysql')
+var jsonfile = require('jsonfile')
+
+// Get the Json file that we will use as a database set up
+
 
 var app = express()
 
