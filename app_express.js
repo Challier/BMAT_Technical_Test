@@ -1,7 +1,8 @@
 var http = require('http');
 var express = require('express')
 var bodyParser = require('body-parser')
-var mysql = require('mysql')
+
+// We have imported all the needed modules, let's build our app that will allow us to answer calls!
 
 var app = express()
 
@@ -52,3 +53,19 @@ app.post('/add_song', function (req, res) {
 app.listen(5000, function () {
   	console.log('Example app listening on port 5000!')
 })
+
+
+// Let's setup the MySQL connection
+
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     	: 'localhost',
+  user     	: 'Test',
+  password 	: 'Test',
+  port	  	: '8880'
+});
+
+connection.connect();
+
+
+
