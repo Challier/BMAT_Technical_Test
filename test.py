@@ -36,7 +36,6 @@ def get_response(fct, data, method=GET):
     """
     assert(method in (GET, POST))
     url = 'http://%s:%s/%s' % (hostname, port, fct)
-    print(url, urllib.urlencode(data))
     if method == GET:
         req = urllib2.Request('%s?%s' % (url, urllib.urlencode(data)))
     elif method == POST:
@@ -96,7 +95,6 @@ def add_plays():
                           "start": start.isoformat(), "end": end.isoformat()},
                          method=POST)
 
-
 def check_channel_plays():
     """
     Get the plays for the two channels separately.
@@ -115,7 +113,7 @@ def check_channel_plays():
         chan_plays = {}
         res = json.loads(get_response('get_channel_plays', {
             "channel": channel,
-            "start": datetime.datetime(2013, 1, 1).isoformat(),
+            "start": datetime.datetime(2013, 1, 1).isoformat(), 
             "end": datetime.datetime(2015, 1, 1).isoformat()
         }))
         assert(res['code'] == 0)
