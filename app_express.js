@@ -48,6 +48,43 @@ console.log(db.getData("/"));
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
+// Define an extra function that will allow us avoid duplicates when storing data
+
+function containsName(Item, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (list[i].Name === Item) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function containsTitle(Item, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (list[i].Title === Item) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function containsPlay(Item, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if ( list[i].Title + list[i].Performer + list[i].Channel + list[i].Start === Item.title + Item.performer + Item.channel + Item.start) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 // Define our server using the express module
 
 var app = express()
@@ -77,14 +114,35 @@ app.post('/add_play', function (req, res) {
 	var end 		= req.body.end;
 
 	// Store play in db
-	try{db.push("/Plays[]",{
-		Title: 		title, 
-		Performer: 	performer, 
-		Start: 		start, 
-		End: 		start,
-		Channel: 	channel}, true);}
-	catch(error){console.log('Play insertion failed' + error);}
-	console.log(db.getData("/Plays"));
+	if(!containsPlay(req.body, db.getData("/Plays"))){
+		try{db.push("/Plays[]",{
+			Title: 		title, 
+			Performer: 	performer, 
+			Start: 		start, 
+			End: 		start,
+			Channel: 	channel}, true);}
+		catch(error){console.log('Play insertion failed' + error);}
+	}
+
+	// See if performer is in our records
+	if(!containsName(performer, db.getData("/Performers"))){
+  		try{db.push("/Performers[]",{Name: performer}, true);}
+  		catch(error){console.log('Performer insertion missed' + error);}
+  	}
+
+  	// See if song is in our records
+  	if(!containsTitle(title, db.getData("/Songs"))){
+		try{db.push("/Songs[]",{Title: title, Performer: performer}, true);}
+	  	catch(error){console.log('Title insertion missed' + error);}
+	}
+
+	// See if channel is in our records
+	if(!containsName(channel, db.getData("/Channels"))){
+		try{db.push("/Channels[]",{Name: channel}, true);}
+		catch(error){console.log('Channel insertion missed' + error);}
+	}
+
+	// Send response
   	res.send('Hello World!');
 })
 
@@ -93,10 +151,13 @@ app.post('/add_channel', function (req, res) {
 	var name = req.body.name;
 
 	// Store play in db
-	try{db.push("/Channels[]",{Name: name}, true);}
-	catch(error){console.log('Channel insertion missed' + error);}
+	if(!containsName(name, db.getData("/Channels"))){
+		try{db.push("/Channels[]",{Name: name}, true);}
+		catch(error){console.log('Channel insertion missed' + error);}
+	}
+
+	// Send response
   	res.send('Hello World!');
-  	console.log(db.getData("/Channels"));
 })
 
 app.post('/add_performer', function (req, res) {
@@ -104,10 +165,13 @@ app.post('/add_performer', function (req, res) {
 	var name = req.body.name;
 
 	// Store performer in db
-  	try{db.push("/Performers[]",{Name: name}, true);}
-  	catch(error){console.log('Performer insertion missed' + error);}
+  	if(!containsName(name, db.getData("/Performers"))){
+  		try{db.push("/Performers[]",{Name: name}, true);}
+  		catch(error){console.log('Performer insertion missed' + error);}
+  	}
+
+  	// Send response
   	res.send('Hello World!');
-  	console.log(db.getData("/Performers"));
 })
 
 app.post('/add_song', function (req, res) {
@@ -116,10 +180,19 @@ app.post('/add_song', function (req, res) {
 	var title 		= req.body.title;
 
 	// Store song in db
-	try{db.push("/Songs[]",{Title: title, Performer: performer}, true);}
-  	catch(error){console.log('Title insertion missed' + error);}
+	if(!containsTitle(title, db.getData("/Songs"))){
+		try{db.push("/Songs[]",{Title: title, Performer: performer}, true);}
+	  	catch(error){console.log('Title insertion missed' + error);}
+	}
+
+	// See if performer is in our records
+	if(!containsName(performer, db.getData("/Performers"))){
+  		try{db.push("/Performers[]",{Name: performer}, true);}
+  		catch(error){console.log('Performer insertion missed' + error);}
+  	}
+
+	// Send response
   	res.send('Hello World!');
-  	console.log(db.getData("/Songs"));
 })
 
 app.listen(5000, function () {
