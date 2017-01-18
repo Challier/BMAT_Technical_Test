@@ -1,13 +1,53 @@
-var http = require('http');
-var express = require('express')
-
-function onRequest(request, response){
-	console.log('A user made a request' + request.url + request.method + request.performer);
-	//console.log(request);
-	//response.writeHead(200, ["Content-Type": "text/plain"]);
-	response.write("Here is some data");
-	response.end()
+var JsonDB = require('node-json-db');
+//The second argument is used to tell the DB to save after each push 
+//If you put false, you'll have to call the save() method. 
+//The third argument is to ask JsonDB to save the database in an human readable format. (default false) 
+var db = new JsonDB("myDataBase_Test", true, false);
+ 
+//Pushing the data into the database 
+//With the wanted DataPath 
+//By default the push will override the old value 
+db.push("/test1","super test");
+ 
+//It also create automatically the hierarchy when pushing new data for a DataPath that doesn't exists 
+db.push("/test2/my/test",5);
+ 
+//You can also push directly objects 
+db.push("/test3", {test:"test", json: {test:["test"]}});
+ 
+//If you don't want to override the data but to merge them 
+//The merge is recursive and work with Object and Array. 
+db.push("/test3", {new:"cool", json: {important : 5}}, false);
+/*
+This give you this results :
+{
+   "test":"test",
+   "json":{
+      "test":[
+         "test"
+      ],
+      "important":5
+   },
+   "new":"cool"
 }
-
-http.createServer(onRequest).listen(5000);
-console.log("Server is now running...")
+*/
+//You can't merge primitive. 
+//If you do this: 
+db.push("/test2/my/test/",10,false);
+//the data will be overriden 
+ 
+//Get the data from the root 
+var data = db.getData("/");
+ 
+//From a particular DataPath 
+var data = db.getData("/test1");
+ 
+//Deleting data 
+db.delete("/test1");
+ 
+//Save the data (useful if you disable the saveOnPush) 
+db.save();
+ 
+//In case you have a exterior change to the databse file and want to reload it 
+//use this method 
+db.reload();
