@@ -7,7 +7,11 @@ var bodyParser = require('body-parser')
 // Initiate JSON database using the module node-json-db
 
 var JsonDB = require('node-json-db')
-
+var db = new JsonDB("myDataBase");
+//db.push("/test1","super test");
+//db.push("/test2/my/test",5);
+db.push("/test3", {test:"test", json: {test:["test"]}});
+db.push("/test3", {new:"cool", json: {important : 5}}, false);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
