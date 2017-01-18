@@ -3,8 +3,60 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var jsonfile = require('jsonfile')
 
-// Get the Json file that we will use as a database set up
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
+
+// Initiate the Json file that we will use as a database set up
+// To do so, we use the module jsonfile which perfectly suits our needs
+
+// Initiate the file with the song information
+var file = 'songs.json'
+var obj = {
+	title: 		'Unknown',
+	performer: 	'Unknown'
+}
+ 
+jsonfile.writeFileSync(file, obj)
+jsonfile.readFile(file, function(err, obj) {
+  console.log('The answer to the json call is:', obj)
+});
+
+// Initiate the performer file
+var file = 'performer.json'
+var obj = {
+	performer: 	'performer'
+}
+ 
+jsonfile.writeFileSync(file, obj)
+jsonfile.readFile(file, function(err, obj) {
+  console.log('The answer to the json call is:', obj)
+});
+
+// Initiate the channel file
+var file = 'channel.json'
+var obj = {
+	channel: 	'Unknown'
+}
+ 
+jsonfile.writeFileSync(file, obj)
+jsonfile.readFile(file, function(err, obj) {
+  console.log('The answer to the json call is:', obj)
+});
+
+// Initiate the plays file
+var file = 'plays.json'
+var obj = {name: 'd'}
+ 
+jsonfile.writeFileSync(file, obj)
+jsonfile.readFile(file, function(err, obj) {
+  console.log('The answer to the json call is:', obj)
+});
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+// Set up our server application
 
 var app = express()
 
