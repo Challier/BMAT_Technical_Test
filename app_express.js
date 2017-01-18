@@ -7,14 +7,44 @@ var bodyParser = require('body-parser')
 // Initiate JSON database using the module node-json-db
 
 var JsonDB = require('node-json-db')
-var db = new JsonDB("myDataBase");
-//db.push("/test1","super test");
-//db.push("/test2/my/test",5);
-db.push("/test3", {test:"test", json: {test:["test"]}});
-db.push("/test3", {new:"cool", json: {important : 5}}, false);
+var db = new JsonDB("myDataBase", true);
+
+// Initiate the tree in our database
+
+// myDataBase	--	Songs		--	Title
+//								--	Performer
+//				--	Channel		--	Name
+//				--	Performer 	--	Name
+// 				--	Plays 		--	Title
+//								--	Start
+//								--	End
+//								--	Channel
+
+// Declare default values
+var default_title 		= "Unknown";
+var default_date 		= new Date("January 2, 1900 00:00:00").toISOString();
+var default_Performer	= "Unknown"
+var default_Name 		= "Unknown"
+var default_Channel 	= "Unknown"
+
+
+db.push("/Songs",{
+	Title: "Unknown", 
+	Performer: "Unknown"
+}, false);
+db.push("/Channel",{Name: "Unknown"}, false);
+db.push("/Performer",{Name: "Unknown"}, false);
+db.push("/Plays",{
+	Title: 		default_title, 
+	Performer: 	default_Performer, 
+	Start: 		default_date, 
+	End: 		default_date
+}, false);
+
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
+// Define our server using the express module
 
 var app = express()
 
