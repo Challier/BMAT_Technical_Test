@@ -36,6 +36,7 @@ def get_response(fct, data, method=GET):
     """
     assert(method in (GET, POST))
     url = 'http://%s:%s/%s' % (hostname, port, fct)
+    print(url, urllib.urlencode(data))
     if method == GET:
         req = urllib2.Request('%s?%s' % (url, urllib.urlencode(data)))
     elif method == POST:
