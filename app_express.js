@@ -30,12 +30,16 @@ var default_Channel 	= "Unknown"
 //								--	Channel
 
 // Initiate tree if needed and add default values
+// Initiaite song array
 db.push("/Songs[0]", {
 	Title: default_title, 
 	Performer: default_Performer
 }, true);
+// Initiaite Performes array
 db.push("/Performers[0]",{Name: default_Name}, true);
+// Initiaite Channels array
 db.push("/Channels[0]",{Name: default_Name}, true);
+// Initiaite Plays array
 db.push("/Plays[0]",{
 	Title: 		default_title, 
 	Performer: 	default_Performer, 
@@ -94,16 +98,13 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   	extended: true
 })); 
 
-app.get('/', function (req, res) {
-  	res.send('Hello World!');
-  	console.log('One / call was made');
+app.listen(5000, function () {
+  	console.log('Example app listening on port 5000!')
 })
 
-app.get('/get_channel_plays', function (req, res) {
-  	res.send('Hello World!');
-  	console.log('One /get_channel_plays call was made');
-  	console.log(db.getData("/"));
-})
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// Build all the methods needed for the POST requests
 
 app.post('/add_play', function (req, res) {
 	// Collect data from request
@@ -124,19 +125,19 @@ app.post('/add_play', function (req, res) {
 		catch(error){console.log('Play insertion failed' + error);}
 	}
 
-	// See if performer is in our records
+	// See if performer is in our records. If not, add it.
 	if(!containsName(performer, db.getData("/Performers"))){
   		try{db.push("/Performers[]",{Name: performer}, true);}
   		catch(error){console.log('Performer insertion missed' + error);}
   	}
 
-  	// See if song is in our records
+  	// See if song is in our records. If not, add it.
   	if(!containsTitle(title, db.getData("/Songs"))){
 		try{db.push("/Songs[]",{Title: title, Performer: performer}, true);}
 	  	catch(error){console.log('Title insertion missed' + error);}
 	}
 
-	// See if channel is in our records
+	// See if channel is in our records. If not, add it.
 	if(!containsName(channel, db.getData("/Channels"))){
 		try{db.push("/Channels[]",{Name: channel}, true);}
 		catch(error){console.log('Channel insertion missed' + error);}
@@ -185,7 +186,7 @@ app.post('/add_song', function (req, res) {
 	  	catch(error){console.log('Title insertion missed' + error);}
 	}
 
-	// See if performer is in our records
+	// See if performer is in our records. If not, add it.
 	if(!containsName(performer, db.getData("/Performers"))){
   		try{db.push("/Performers[]",{Name: performer}, true);}
   		catch(error){console.log('Performer insertion missed' + error);}
@@ -195,6 +196,18 @@ app.post('/add_song', function (req, res) {
   	res.send('Hello World!');
 })
 
-app.listen(5000, function () {
-  	console.log('Example app listening on port 5000!')
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// Build all the methods needed for the GET requests - Includes setting up a query method
+
+app.get('/', function (req, res) {
+  	res.send('Hello World!');
+  	console.log('One / call was made');
 })
+
+app.get('/get_channel_plays', function (req, res) {
+  	res.send('Hello World!');
+  	console.log('One /get_channel_plays call was made');
+  	console.log(db.getData("/"));
+})
+
