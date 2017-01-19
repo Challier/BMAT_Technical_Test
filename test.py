@@ -127,6 +127,8 @@ def check_channel_plays():
                 (start.year, start.month, start.day,
                  start.hour, start.minute, start.second)] = (
                      performer, title, (end - start).total_seconds())
+        print(chan_plays)
+        print(plays[channel])
         assert(chan_plays == plays[channel])
 
 

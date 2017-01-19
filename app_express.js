@@ -120,7 +120,7 @@ app.post('/add_play', function (req, res) {
 			title: 		title, 
 			performer: 	performer, 
 			start: 		start, 
-			end: 		start,
+			end: 		end,
 			channel: 	channel}, true);}
 		catch(error){console.log('Play insertion failed' + error);}
 	}
@@ -202,7 +202,7 @@ app.post('/add_song', function (req, res) {
 
 
 app.get('/get_channel_plays', function (req, res) {
-
+	console.log('One /get_channel_plays call was made');
 	/*
     Get the plays for the a channel.
 
@@ -221,25 +221,77 @@ app.get('/get_channel_plays', function (req, res) {
     var channel = req.query.channel;
     var start 	= req.query.start;
     var end 	= req.query.end;
+    var result 	= new Array()
 
+    try{
+		result 	= db.getData("/Plays")
+			.filter(function (el) {return (el.channel === channel && start < el.start && el.end < end)})
+			.map(function (el) {return {performer: el.performer, title: el.title, start: el.start, end: el.end}});
 
-    console.log(channel, start, end, start > end,
-    	db.getData("/Plays").filter(function (el) 
-    		{return (el.channel === channel && start < el.start && el.end < end)})
-    );
-     
-  	res.send(db.getData("/Plays").filter(function (el) 
-    		{return (el.channel === channel && start < el.start && el.end < end)}));
-  	console.log('One /get_channel_plays call was made');
+    	res.send({result: result, code: 0})
+    	console.log("Records successfully retrieved");
+    }
+    catch(error)
+    {
+    	res.send({result: "", code: 1, errors: error})
+    	console.log('There was an error in the records retrieval: ' + error);
+    } 
 });
 
 app.get('/get_song_plays', function (req, res) {
-  	res.send('Hello World!');
+	/*
+    Check the plays for one particular song. Here the results should look like
+    this:
+
+    {result: [
+     {'channel': 'channel1', 'start': '2014-01-10T01:00:00',
+      'end': '2014-01-10T01:03:00'},
+     {'channel': 'channel2', 'start': '2014-01-01T02:00:00',
+      'end': '2014-01-01T02:03:00'}, ...], code: 0}
+    */
   	console.log('One /get_song_plays call was made');
-  	console.log(db.getData("/"));
+
+  	// Gather variables from request
+  	var title 	= req.query.title;
+  	var result 	= new Array()
+
+
+  	try{
+  		result 	= db.getData("/Plays")
+  			.filter(function (el) {return (el.title === title)})
+  			.map(function (el) {return {channel: el.channel, start: el.start, end: el.end}});
+    	
+    	res.send({result: result, code: 0});
+    	console.log("Records successfully retrieved");
+    }
+    catch(error)
+    {
+    	res.send({result: "", code: 1, errors: error})
+    	console.log('There was an error in the records retrieval: ' + error);
+    } 
 });
 
 app.get('/get_top', function (req, res) {
+	/*
+	Here we expect a list of [performer, song, plays, previous plays, previous
+    rank]. Previous ranks starts at 0. If the song was not in the list for the
+    past, the previous rank should be null.
+
+    {result: [
+     {'performer': 'Performer1', 'title': 'Song1', 'rank': 0,
+      'previous_rank': 2, 'plays': 1, 'previous_plays': 2},...],
+     'code': 0}
+	
+	Arguments passed in query:
+    { 
+    	channels: '["Channel2", "Channel1"]',
+  		start: '2014-01-08T00:00:00',
+  		limit: '10' 
+  	} 
+	*/
+
+	console.log(req.query)
+
   	res.send('Hello World!');
   	console.log('One /get_top call was made');
   	console.log(db.getData("/"));
