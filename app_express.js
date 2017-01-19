@@ -87,6 +87,19 @@ function containsPlay(Item, list) {
     return false;
 }
 
+function listCount(List){
+	var counts 	= new Array()
+	for (i = 0; i < list.length; i++) {
+		j = counts.indexOf(List[i]);
+		if (j > -1){
+			counts.counts[j] += 1;
+		}
+		else {
+			counts += 
+		}
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // Define our server using the express module
@@ -290,10 +303,33 @@ app.get('/get_top', function (req, res) {
   	} 
 	*/
 
-	console.log(req.query)
+	console.log('One /get_top call was made');
 
-  	res.send('Hello World!');
+	// Gather variables from request
+	var start 		= req.query.start
+	var channels 	= req.query.channels
+	var limit		= req.query.limit
+	var result 		= new Array()
+
+
+  	try{
+  		plays_week 		= db.getData("/Plays")
+  			.filter(function (el) {return (Date.parse(start) < Date.parse(el.start) && Date.parse(el.start) < Date.parse(start) + 6.048e+8 && channels.indexOf(el.channel) > -1)})
+  			.map(function (el) {return {title: el.title, performer: el.performer}});
+  		plays_preweek 	= db.getData("/Plays")
+  			.filter(function (el) {return (Date.parse(start) - 6.048e+8 < Date.parse(el.start) && Date.parse(el.start) < Date.parse(start) && channels.indexOf(el.channel) > -1)})
+  			.map(function (el) {return {title: el.title, performer: el.performer}});
+    	res.send({result: plays_preweek, code: 0});
+    	console.log("Records successfully retrieved", plays_week, plays_preweek);
+    }
+    catch(error)
+    {
+    	res.send({result: "", code: 1, errors: error})
+    	console.log('There was an error in the records retrieval: ' + error);
+    } 
+
+    plays_week_count
+
   	console.log('One /get_top call was made');
-  	console.log(db.getData("/"));
 });
 
