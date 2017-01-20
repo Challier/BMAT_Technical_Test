@@ -9,7 +9,6 @@ var bodyParser = require('body-parser')
 var JsonDB = require('node-json-db')
 var db = new JsonDB("myDataBase", true, false);
 
-db.delete("/");
 
 // Declare default values
 var default_title 		= "Unknown";
@@ -31,24 +30,53 @@ var default_channel 	= "Unknown"
 
 // Initiate tree if needed and add default values
 // Initiaite song array
-db.push("/Songs[0]", {
-	title: default_title, 
-	performer: default_performer
-}, true);
-// Initiaite Performes array
-db.push("/Performers[0]",{name: default_name}, true);
-// Initiaite Channels array
-db.push("/Channels[0]",{name: default_name}, true);
-// Initiaite Plays array
-db.push("/Plays[0]",{
-	title: 		default_title, 
-	performer: 	default_performer, 
-	start: 		default_date, 
-	end: 		default_date,
-	channel: 	default_channel
-}, true);
 
-console.log(db.getData("/"));
+console.log('Initiate database...')
+
+try{
+	db.getData("/Songs")
+	console.log('Songs already exist in db')
+}
+catch(error){
+	db.push("/Songs[0]", {
+		title: default_title, 
+		performer: default_performer
+	}, true);
+	console.log('Song retrieve failed, new branch is created')
+}
+// Initiaite Performes array
+try{
+	test = db.getData("/Performers")
+	console.log('Songs already exist in db')
+}
+catch(error){
+	test = db.push("/Performers[0]",{name: default_name}, true);
+	console.log('Performers retrieve failed, new branch is created')
+}
+// Initiaite Channels array
+try{
+	test = db.getData("/Channels")
+	console.log('Channels already exist in db')
+}
+catch(error){
+	db.push("/Channels[0]",{name: default_name}, true);
+	console.log('Channels retrieve failed, new branch is created')
+}
+// Initiaite Plays array
+try{
+	test = db.getData("/Plays")[0]
+	console.log('Plays already exist in db')
+}
+catch(error){
+	db.push("/Plays[0]",{
+		title: 		default_title, 
+		performer: 	default_performer, 
+		start: 		default_date, 
+		end: 		default_date,
+		channel: 	default_channel
+	}, true);
+	console.log('Plays retrieve failed, new branch is created')
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -112,7 +140,6 @@ function listCount_top(List, limit){
 		}
 	});
 
-	console.log(dict_count)
 
 	list_count = new Array();
 	for (var key in dict_count){
@@ -346,7 +373,7 @@ app.get('/get_top', function (req, res) {
   		plays_preweek 	= db.getData("/Plays")
   			.filter(function (el) {return (Date.parse(start) - 6.048e+8 < Date.parse(el.start) && Date.parse(el.start) < Date.parse(start) && channels.indexOf(el.channel) > -1)})
   			.map(function (el) {return {title: el.title, performer: el.performer}});
-    	console.log("Records successfully retrieved", plays_week, plays_preweek);
+    	console.log("Records successfully retrieved");
     }
     catch(error)
     {
@@ -384,9 +411,6 @@ app.get('/get_top', function (req, res) {
 	};
 
 	res.send({result: result, code: 0});
-	console.log(plays_week_count)
-	console.log(plays_preweek_count)
-	console.log({result: result, code: 0})
 
 });
 
