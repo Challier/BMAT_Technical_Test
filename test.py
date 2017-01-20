@@ -237,6 +237,7 @@ def check_top():
     }))
     assert(res['code'] == 0)
     top = res['result']
+    print(get_top(datetime.datetime(2014, 1, 8), plays.keys()))
     assert(top == get_top(datetime.datetime(2014, 1, 8), plays.keys()))
 
 

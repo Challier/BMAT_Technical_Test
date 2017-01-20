@@ -87,17 +87,47 @@ function containsPlay(Item, list) {
     return false;
 }
 
-function listCount(List){
-	var counts 	= new Array()
-	for (i = 0; i < list.length; i++) {
-		j = counts.indexOf(List[i]);
-		if (j > -1){
-			counts.counts[j] += 1;
+function listCount_top(List, limit){
+	/* Example input for plays_week
+	[ { title: 'Song2', performer: 'Performer2' },
+	  { title: 'Song2', performer: 'Performer2' },
+	  { title: 'Song2', performer: 'Performer2' },
+	  { title: 'Song2', performer: 'Performer2' },
+	  { title: 'Söng3', performer: 'Pêrformer3' },
+	  { title: 'Song1', performer: 'Performer1' },
+	  { title: 'Song1', performer: 'Performer1' },
+	  { title: 'Song2', performer: 'Performer2' } ]
+
+  	output wanted: {'Song2': 5, 'Song3': 1, 'Song1':2} 
+	*/
+	var dict_count 	= new Object;
+
+	List.forEach(function(element) {
+		var key = element.title;
+		if (key in dict_count){
+			dict_count[key].count += 1;
 		}
 		else {
-			counts += 
+			dict_count[key] = {title: key, performer: element.performer, count: 1};
 		}
-    }
+	});
+
+	console.log(dict_count)
+
+	list_count = new Array();
+	for (var key in dict_count){
+		list_count.push([key, dict_count[key].count]);
+	} 
+
+	function compare(a,b) {
+	  if (a[1] < b[1])
+	    return 1;
+	  if (a[1] > b[1])
+	    return -1;
+	  return 0;
+	}
+
+	return [list_count.sort(compare).slice(0,limit), dict_count];
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -211,8 +241,7 @@ app.post('/add_song', function (req, res) {
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-// Build all the methods needed for the GET requests - Includes setting up a query method
-
+// Build all the methods needed for the GET requests 
 
 app.get('/get_channel_plays', function (req, res) {
 	console.log('One /get_channel_plays call was made');
@@ -309,8 +338,6 @@ app.get('/get_top', function (req, res) {
 	var start 		= req.query.start
 	var channels 	= req.query.channels
 	var limit		= req.query.limit
-	var result 		= new Array()
-
 
   	try{
   		plays_week 		= db.getData("/Plays")
@@ -319,7 +346,6 @@ app.get('/get_top', function (req, res) {
   		plays_preweek 	= db.getData("/Plays")
   			.filter(function (el) {return (Date.parse(start) - 6.048e+8 < Date.parse(el.start) && Date.parse(el.start) < Date.parse(start) && channels.indexOf(el.channel) > -1)})
   			.map(function (el) {return {title: el.title, performer: el.performer}});
-    	res.send({result: plays_preweek, code: 0});
     	console.log("Records successfully retrieved", plays_week, plays_preweek);
     }
     catch(error)
@@ -328,8 +354,39 @@ app.get('/get_top', function (req, res) {
     	console.log('There was an error in the records retrieval: ' + error);
     } 
 
-    plays_week_count
+    count = listCount_top(plays_week, limit);
+    plays_week_count 	= count[0];
+    dict_week 			= count[1];
 
-  	console.log('One /get_top call was made');
+    plays_preweek_count	= listCount_top(plays_preweek, limit)[0];
+
+    var result 		= new Array();
+    var len 		= Math.min(plays_week_count.length, limit)
+
+    for (i = 0; i < len; i++) {
+
+    	/* result: [
+     {'performer': 'Performer1', 'title': 'Song1', 'rank': 0,
+      'previous_rank': 2, 'plays': 1, 'previous_plays': 2},...] */
+    	previous_rank	= null;
+    	previous_plays 	= 0;
+		title 			= plays_week_count[i][0];
+
+		for (j = 0; j < len; j++) {
+        	if (plays_preweek_count[j][0] === title) {
+        		previous_rank 	= j;
+        		previous_plays	= plays_preweek_count[j][1];
+        	}
+    	}
+
+    	result.push({'performer': dict_week[title].performer, 'title': title, 'rank': i, 'previous_rank': previous_rank, 'plays': plays_week_count[i][1], 'previous_plays': previous_plays});
+
+	};
+
+	res.send({result: result, code: 0});
+	console.log(plays_week_count)
+	console.log(plays_preweek_count)
+	console.log({result: result, code: 0})
+
 });
 
