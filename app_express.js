@@ -160,17 +160,20 @@ function listCount_top(List, limit){
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // Define our server using the express module
+try{
+	var app = express()
 
-var app = express()
-
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  	extended: true
-})); 
-
-app.listen(5000, function () {
-  	console.log('Example app listening on port 5000!')
-})
+	app.use( bodyParser.json() );       // to support JSON-encoded bodies
+	app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+	  	extended: true
+	})); 
+	app.listen(5000, function () {
+	  	console.log('App listening on port 5000!')
+	})
+}
+catch(error){
+	console.log('Couldn\'t initiate the app');
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
