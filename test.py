@@ -36,7 +36,6 @@ def get_response(fct, data, method=GET):
     """
     assert(method in (GET, POST))
     url = 'http://%s:%s/%s' % (hostname, port, fct)
-    print(url, urllib.urlencode(data))
     if method == GET:
         req = urllib2.Request('%s?%s' % (url, urllib.urlencode(data)))
     elif method == POST:
@@ -96,7 +95,6 @@ def add_plays():
                           "start": start.isoformat(), "end": end.isoformat()},
                          method=POST)
 
-
 def check_channel_plays():
     """
     Get the plays for the two channels separately.
@@ -115,7 +113,7 @@ def check_channel_plays():
         chan_plays = {}
         res = json.loads(get_response('get_channel_plays', {
             "channel": channel,
-            "start": datetime.datetime(2013, 1, 1).isoformat(),
+            "start": datetime.datetime(2013, 1, 1).isoformat(), 
             "end": datetime.datetime(2015, 1, 1).isoformat()
         }))
         assert(res['code'] == 0)
@@ -129,6 +127,8 @@ def check_channel_plays():
                 (start.year, start.month, start.day,
                  start.hour, start.minute, start.second)] = (
                      performer, title, (end - start).total_seconds())
+        print(chan_plays)
+        print(plays[channel])
         assert(chan_plays == plays[channel])
 
 
@@ -237,6 +237,7 @@ def check_top():
     }))
     assert(res['code'] == 0)
     top = res['result']
+    print(get_top(datetime.datetime(2014, 1, 8), plays.keys()))
     assert(top == get_top(datetime.datetime(2014, 1, 8), plays.keys()))
 
 
